@@ -2,3 +2,8 @@ body {
   font-family: 'Open Snas Condensed';
   padding: 20px 60px;
 }
+ /* a for all the link tags to remove the UNDERLINE AND PURPLE COLOR that comes with default in LINK tag*/
+a {
+  text-decoration: none;
+  color: black;
+}
