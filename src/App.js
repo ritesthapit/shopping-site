@@ -1,17 +1,15 @@
 import React from "react";
-import { Route, Switch } from "react-router-dom";
+import { connect } from "react-redux";
+import { Redirect, Route, Switch } from "react-router-dom";
 import "./App.css";
 import Homepage from "./pages/homepage/homepage.component";
 import ShopPage from "./pages/shop/shop.component";
 import Header from "./components/header/header.component";
 import SignInAndSignUpPage from "./pages/sign-in-and-sign-up/sign-in-and-sign-up.component";
 import { auth, createUserProfileDocument } from "./firebase/firebase.utils";
+import { setCurrentUser } from "./redux/user/user.actions";
 
 class App extends React.Component {
-	state = {
-		currentUser: null,
-	};
-
 	unsubscribeFromAuth = null;
 
 	componentDidMount() {
@@ -29,21 +27,21 @@ class App extends React.Component {
 				//snapshot object -- has the data related to the user -- accessed by .data() method
 
 				userRef.onSnapshot((snapShot) => {
-					this.setState({
-						currentUser: {
-							id: snapShot.id, //id of the data that we get from snapshot
-							...snapShot.data(), //currentUser will have all the properties of snapshot we want
-						},
+					this.props.setCurrentUser({
+						id: snapShot.id, //id of the data that we get from snapshot
+						...snapShot.data(), //currentUser will have all the properties of snapshot we want
 					});
 				});
 			} else {
 				//if signed out --- currentUser == null
-				this.setState({ currentUser: userAuth });
+				this.props.setCurrentUser(userAuth);
 			}
 		});
 	}
 
-	//to close subscription when the component unmounts
+	//to unsubscribe from the listener onAuthStateChanged() -- call the function from the below component so that we dont get
+	//memory leaks in our application related to listener still being open even if the component that cares about the listener
+	//is no longer on the page.
 	componentWillUnmount() {
 		this.unsubscribeFromAuth();
 	}
@@ -51,15 +49,36 @@ class App extends React.Component {
 	render() {
 		return (
 			<div>
-				<Header currentUser={this.state.currentUser} />
+				<Header />
 				<Switch>
 					<Route path="/" exact component={Homepage} />
 					<Route path="/shop" component={ShopPage} />
-					<Route path="/signIn" component={SignInAndSignUpPage} />
+					<Route
+						exact
+						path="/signIn"
+						render={() =>
+							this.props.currentUser ? (
+								<Redirect to="/" />
+							) : (
+								<SignInAndSignUpPage />
+							)
+						}
+					/>
 				</Switch>
 			</div>
 		);
 	}
 }
 
-export default App;
+const mapDispatchToProps = (dispatch) => {
+	return {
+		setCurrentUser: (user) => dispatch(setCurrentUser(user)),
+	};
+};
+
+const mapStateToProps = (state) => {
+	return {
+		currentUser: state.user.currentUser,
+	};
+};
+export default connect(mapStateToProps, mapDispatchToProps)(App);

@@ -24,10 +24,12 @@ class SignUp extends React.Component {
 		}
 
 		try {
+			//create a new user with Email and Password and sign in
 			const { user } = await auth.createUserWithEmailAndPassword(
 				email,
 				password
 			);
+			//create a user profile and add to database with the display name
 			await createUserProfileDocument(user, { displayName });
 
 			this.setState({
