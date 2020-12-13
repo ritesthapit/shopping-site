@@ -4,8 +4,9 @@ import { connect } from "react-redux";
 import "./header.styles.scss";
 import { ReactComponent as Logo } from "../../assets/crown.svg"; //tells Create React App to create a React Component that renders an SVG rather than its filename
 import { auth } from "../../firebase/firebase.utils";
-
-const Header = ({ currentUser }) => {
+import CartIcon from "../cart-icon/cart-icon.component";
+import CartDropdown from "../cart-dropdown/cart-dropdown.component";
+const Header = ({ currentUser, cartHidden }) => {
 	return (
 		<div className="header">
 			<Link to="/" className="logo-container">
@@ -30,7 +31,9 @@ const Header = ({ currentUser }) => {
 						SIGN IN{" "}
 					</Link>
 				)}
+				<CartIcon />
 			</div>
+			{cartHidden ? null : <CartDropdown />}
 		</div>
 	);
 };
@@ -38,6 +41,7 @@ const Header = ({ currentUser }) => {
 const mapStateToProps = (state) => {
 	return {
 		currentUser: state.user.currentUser,
+		cartHidden: state.cart.hidden,
 	};
 };
 
