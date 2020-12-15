@@ -39,6 +39,7 @@ const Header = ({ currentUser, cartHidden }) => {
 };
 
 const mapStateToProps = (state) => {
+	console.log("Header Rendered");
 	return {
 		currentUser: state.user.currentUser,
 		cartHidden: state.cart.hidden,
