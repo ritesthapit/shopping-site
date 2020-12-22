@@ -1,11 +1,15 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
-import "./header.styles.scss";
-import { ReactComponent as Logo } from "../../assets/crown.svg"; //tells Create React App to create a React Component that renders an SVG rather than its filename
+import { createStructuredSelector } from "reselect";
 import { auth } from "../../firebase/firebase.utils";
 import CartIcon from "../cart-icon/cart-icon.component";
 import CartDropdown from "../cart-dropdown/cart-dropdown.component";
+import { selectCurrentUser } from "../../redux/user/user.selectors";
+import { selectCartHidden } from "../../redux/cart/cart.selectors";
+import { ReactComponent as Logo } from "../../assets/crown.svg"; //tells Create React App to create a React Component that renders an SVG rather than its filename
+import "./header.styles.scss";
+
 const Header = ({ currentUser, cartHidden }) => {
 	return (
 		<div className="header">
@@ -38,12 +42,10 @@ const Header = ({ currentUser, cartHidden }) => {
 	);
 };
 
-const mapStateToProps = (state) => {
-	console.log("Header Rendered");
-	return {
-		currentUser: state.user.currentUser,
-		cartHidden: state.cart.hidden,
-	};
-};
+//createStructuredSelector will provide top level state from mapStateToProps into subsequent selector
+const mapStateToProps = createStructuredSelector({
+	currentUser: selectCurrentUser,
+	cartHidden: selectCartHidden,
+});
 
 export default connect(mapStateToProps)(Header);
